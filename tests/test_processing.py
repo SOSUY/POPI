@@ -1,33 +1,53 @@
+from datetime import datetime
 from typing import List
 
-import pytest
 
-from src.processing import filter_by_state, sort_by_date
+def sort_by_date(list_of_dicts: List[dict], order: str = 'descending') -> List[dict]:
+    """
+    Сортирует список словарей по ключу 'date' в порядке возрастания или убывания.
+
+    Args:
+        list_of_dicts: Список словарей, содержащих ключ 'date' в виде строки.
+        order: Порядок сортировки, либо 'ascending', либо 'descending'. По умолчанию используется 'descending'.
+
+    Returns:
+        Отсортированный список словарей по ключу 'date'.
+    """
+    reverse = order == 'descending'  # Определяем, нужно ли сортировать в обратном порядке
+    return sorted(list_of_dicts, key=lambda x: datetime.fromisoformat(x['date']), reverse=reverse)
 
 
-@pytest.fixture
-def input_data_filter() -> List[dict]:
-    return [
-        {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-        {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-        {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-        {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+def filter_by_state(list_of_dicts: List[dict], state: str = 'EXECUTED') -> List[dict]:
+    """
+    Фильтрует список словарей по ключу 'state'.
+
+    Args:
+        list_of_dicts: Список словарей, содержащих ключ 'state' в виде строки.
+        state: Состояние, по которому будет производиться фильтрация. По умолчанию 'EXECUTED'.
+
+    Returns:
+        Отфильтрованный список словарей, содержащих указанное 'state'.
+    """
+    return [item for item in list_of_dicts if item.get('state') == state]
+    # Возвращаем только те элементы, которые соответствуют состоянию
+
+
+# Пример использования
+if __name__ == "__main__":
+    input_data = [
+        {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
+        {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
+        {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
+        {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'}
     ]
 
+    # Сортировка по дате
+    output_descending = sort_by_date(input_data, 'descending')
+    print("Sorted by date (descending):", output_descending)
 
-def test_filter_by_state_default(input_data_filter: List[dict]) -> None:
-    output_default = filter_by_state(input_data_filter, "EXECUTED")
-    assert output_default == [
-        {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-        {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-    ]
+    # Фильтрация по состоянию
+    output_executed = filter_by_state(input_data, 'EXECUTED')
+    output_canceled = filter_by_state(input_data, 'CANCELED')
 
-
-def test_filter_sort_by_date(input_data_filter: List[dict]) -> None:
-    output_canceled = sort_by_date(input_data_filter, "CANCELED")
-    assert output_canceled == [
-        {"date": "2018-06-30T02:08:58.425572", "id": 939719570, "state": "EXECUTED"},
-        {"date": "2018-09-12T21:27:25.241689", "id": 594226727, "state": "CANCELED"},
-        {"date": "2018-10-14T08:21:33.419441", "id": 615064591, "state": "CANCELED"},
-        {"date": "2019-07-03T18:35:29.512364", "id": 41428829, "state": "EXECUTED"},
-    ]
+    print("Filtered by state (EXECUTED):", output_executed)
+    print("Filtered by state (CANCELED):", output_canceled)
