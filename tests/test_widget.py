@@ -2,10 +2,6 @@ import pytest
 
 from src.widget import convert_date_format, mask_number
 
-"""
-# Проверка функции mask_number()
-"""
-
 
 @pytest.mark.parametrize(
     "input_number, expected_output",
@@ -17,17 +13,15 @@ from src.widget import convert_date_format, mask_number
     ]
 )
 def test_mask_number(input_number: str, expected_output: str) -> None:
+    """
+    Проверка функции mask_number()
+    """
     assert mask_number(input_number) == expected_output
-    assert mask_number(input_number) == expected_output
-    assert mask_number(input_number) == expected_output
-    assert mask_number(input_number) == expected_output
-
-
-"""
-# Проверка функции convert_date_format()
-"""
 
 
 def test_convert_date_format() -> None:
+    """
+    Проверка функции convert_date_format()
+    """
     assert convert_date_format("2018-07-11T02:26:18.671407") == "11.07.2018"
     assert convert_date_format("2023-12-31T23:59:59.999999") == "31.12.2023"
