@@ -1,6 +1,6 @@
-from src.masks import mask_account, mask_card
-
 from pytest import fixture
+
+from src.masks import mask_account, mask_card
 
 
 @fixture
