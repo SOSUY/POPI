@@ -1,6 +1,7 @@
 import os
 import pytest
 from unittest.mock import patch
+import datetime  # Добавили импорт datetime
 
 from decorators import log  # Предположим, что декоратор находится в модуле 'decorators.py'
 
