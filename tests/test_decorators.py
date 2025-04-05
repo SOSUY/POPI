@@ -1,13 +1,16 @@
-import pytest
-from src.decorators import my_function
+from tests.conftest import test_1, test_2, test_3, test_4
 
-@pytest.fixture
-def b():
-    return 2
 
-def test_my_function(b):
-    assert my_function(1, b) == 3
-    assert my_function(2, b) == 4
-    assert my_function(3, b) == 5
-    assert my_function(4, b) == 6
-    assert my_function(5, b) == 7
+def test_decorators(capsys):
+    print(test_1(12))
+    captured = capsys.readouterr()
+    assert captured.out == "test_1 24\n"
+    print(test_2(15, "15"))
+    captured = capsys.readouterr()
+    assert captured.out == "test_2 error: TypeError. Inputs: (15, '15'), {}\n"
+    test_3(15)
+    file = open("log_test", "r")
+    assert file.read() == "test_3 30"
+    test_4(10, "50")
+    file = open("error_test", "r")
+    assert file.read() == "test_4 error: TypeError. Inputs: (10, '50'), {}"

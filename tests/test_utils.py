@@ -1,51 +1,12 @@
-import json
-import os
-from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-import pytest
-import requests
-from dotenv import load_dotenv
-
-from src.utils import get_transaction_rub, read_transactions
-
-load_dotenv()
-API_KEY = os.getenv("api_key")
+from src.utils import json_transactions
 
 
-@pytest.fixture(scope='session', autouse=True)
-def remove_temp_files():
-    yield
-    for filename in ['test_transactions.json']:
-        if os.path.exists(filename):
-            os.remove(filename)
-
-
-@patch('requests.get')
-def test_get_transaction_rub_api_error(mock_get: Mock) -> None:
-    """Тестируем поведение функции при ошибке API."""
-    mock_response = Mock()
-    mock_response.raise_for_status.side_effect = requests.exceptions.RequestException
-    mock_get.return_value = mock_response
-
-    result = get_transaction_rub('USD')
-    assert result == 1.0
-
-
-def test_read_transactions_success() -> None:
-    """Тест успешного чтения файла с транзакциями."""
-    test_data = [{'amount': 100, 'currency': 'RUB'}]
-    with open('test_transactions.json', 'w') as f:
-        json.dump(test_data, f)
-
-    result = read_transactions(Path('test_transactions.json'))
-    assert result == test_data
-
-
-def test_read_transactions_empty_file() -> None:
-    """Тест чтения пустого файла."""
-    with open('test_transactions.json', 'w'):
-        pass
-
-    result = read_transactions(Path('test_transactions.json'))
-    assert result == []
+def test_json_transactions(test_json):
+    mock_way = Mock(return_value=r"../Python-Project/data/operations.jso")
+    test_way = r"../Python-Project/data/operations.json"
+    not_correct_way = r"../Python-Project/tests/test_operations.json"
+    assert json_transactions(mock_way) == []
+    assert json_transactions(test_way) == test_json
+    assert json_transactions(not_correct_way) == []

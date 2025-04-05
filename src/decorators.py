@@ -1,51 +1,29 @@
-import datetime
-import functools
-from typing import Any, Callable
+def log(filename=""):
+    """Этот декоратор автоматически логирует начало и конец выполнения функции,
+     а также ее результаты или возникшие ошибки.
+    Декоратор принимает необязательный аргумент "filename",
+    который определяет, куда будут записываться логи (в файл или в консоль)."""
 
-
-def log(filename: str = None) -> Callable:
-    """
-    Декоратор для логирования вызова функции и её результата.
-
-    :param filename: (опционально) Имя файла для записи логов.
-                     Если не указано, логи выводятся в консоль.
-    """
-
-    def decorator(func: Callable) -> Callable:
-        @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+    def decorator(func):
+        def wrapper(*args, **kwargs):
             try:
                 result = func(*args, **kwargs)
-                log_message = f"{timestamp} {func.__name__} ok"
-            except Exception as e:
-                result = None
-                log_message = (
-                    f"{timestamp} {func.__name__} error: "
-                    f"{type(e).__name__}. Inputs: {args}, {kwargs}"
-                )
-
-            if filename:
-                with open(filename, "a") as file:
-                    file.write(log_message + "\n")
+            except Exception as error:
+                if filename == "":
+                    return f"{func.__name__} error: {type(error).__name__}. Inputs: {args}, {kwargs}"
+                else:
+                    file = open(filename, "w")
+                    file.write(f"{func.__name__} error: {type(error).__name__}. Inputs: {args}, {kwargs}")
+                    file.close()
             else:
-                print(log_message)
-
-            return result
+                if filename == "":
+                    return f"{func.__name__} {result}"
+                else:
+                    file = open(filename, "w")
+                    file.write(f"{func.__name__} {result}")
+                    file.close()
+            return ""
 
         return wrapper
 
     return decorator
-
-
-# Примеры использования
-
-@log(filename="mylog.txt")
-def my_function(x: int, y: int) -> int:
-    """Пример простой функции для тестирования декоратора."""
-    return x + y
-
-
-if __name__ == "__main__":
-    my_function(1, 2)  # Логирование будет выполняться в файл 'mylog.txt'

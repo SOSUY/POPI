@@ -1,26 +1,50 @@
-from datetime import datetime
-
-from src.masks import mask_account, mask_card
-
-
-def mask_number(input_str: str) -> str:
-    """
-    Принимает на вход строку с информацией — тип карты/счета и номер карты/счета.
-    Возвращает исходную строку с замаскированным номером карты/счета.
-    """
-    split_str = input_str.split()
-    if split_str[0] in ["Visa", "MasterCard", "Maestro"]:
-        return " ".join([*filter(str.isalpha, split_str), mask_card("".join([i for i in split_str if i.isdigit()]))])
-    elif split_str[0] == "Счет":
-        return "Счет " + mask_account(split_str[1])
+def mask_account_card(number: str) -> str:
+    """Функция принимает на вход номер карты и счета и возвращает их маску, номер карты и номер счета замаскирован."""
+    card_number = ""
+    name_card = ""
+    if "счёт" in number.lower() or "счет" in number.lower():
+        if len(number) != 25:
+            return "Error"
+        for num in number[5:]:
+            if num.isalpha():
+                return "Error"
+        else:
+            score_number = number[5:]
+            number_mask = number[0:4] + " " + "**" + score_number[-4:]
+            return number_mask
     else:
-        return input_str
+        for num in number:
+            if num.isalpha() or num == " ":
+                name_card += num
+            else:
+                card_number += num
+        if len(card_number) < 16:
+            return "Error"
+        for card_num in card_number:
+            if card_num.isalpha():
+                return "Error"
+        else:
+
+            correct_number = card_number[0:7] + card_number[7:14] + card_number[14:19]
+            number_mask = (
+                name_card
+                + correct_number[0:4]
+                + " "
+                + correct_number[4:6]
+                + "**"
+                + " "
+                + "****"
+                + " "
+                + correct_number[12:16]
+            )
+
+            return number_mask
 
 
-def convert_date_format(input_str: str) -> str:
-    """
-    Функция, которая принимает на вход строку вида 2018-07-11T02:26:18.671407
-    и возвращает строку с датой.
-    """
-    input_date = datetime.strptime(input_str, "%Y-%m-%dT%H:%M:%S.%f")
-    return input_date.strftime("%d.%m.%Y")
+def get_date(date: str) -> str:
+    """Функция принимает на вход строку и отдает корректный результат в формате 11.07.2018."""
+    if len(date) > 26:
+        return "Error"
+    else:
+        correct_date = date[8:10] + "." + date[5:7] + "." + date[0:4]
+        return correct_date

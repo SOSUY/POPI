@@ -1,27 +1,34 @@
 import pytest
 
-from src.widget import convert_date_format, mask_number
+from src.widget import get_date, mask_account_card
 
 
 @pytest.mark.parametrize(
-    "input_number, expected_output",
+    "numbers_info, expected",
     [
-        ("Visa 1234567890123456", "Visa 1234 56** **** 3456"),
-        ("Maestro 9876543210987654", "Maestro 9876 54** **** 7654"),
-        ("Счет 73654108430135874305", "Счет **4305"),
-        ("Some_Text_123456", "Some_Text_123456")
-    ]
+        ("MIR 1596837868705199", "MIR 1596 83** **** 5199"),
+        ("Master Card 6831982476737658", "Master Card 6831 98** **** 7658"),
+        ("Visa 897304958f7290kj", "Error"),
+        ("Visa 394075", "Error"),
+        ("Счёт 73654108430135874305", "Счёт **4305"),
+        ("Счет 19861059860492865092", "Счет **5092"),
+        ("Счет saigq54298dfgjkh895h", "Error"),
+        ("Счёт 23576908536", "Error"),
+    ],
 )
-def test_mask_number(input_number: str, expected_output: str) -> None:
-    """
-    Проверка функции mask_number()
-    """
-    assert mask_number(input_number) == expected_output
+def test_mask_account_card(numbers_info, expected):
+    assert mask_account_card(numbers_info) == expected
 
 
-def test_convert_date_format() -> None:
-    """
-    Проверка функции convert_date_format()
-    """
-    assert convert_date_format("2018-07-11T02:26:18.671407") == "11.07.2018"
-    assert convert_date_format("2023-12-31T23:59:59.999999") == "31.12.2023"
+@pytest.mark.parametrize(
+    "data_info, expected",
+    [
+        ("2024-03-11T02:26:18.671407", "11.03.2024"),
+        ("2022-04-12T04:27:18.671407", "12.04.2022"),
+        ("2014-03-11T02:26:18.", "Error"),
+        ("2024-03-11T02:26:18.671407TR", "Error"),
+        ("", "Error"),
+    ],
+)
+def test_get_data(data_info, expected):
+    assert get_date(data_info) == expected
