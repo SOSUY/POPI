@@ -43,8 +43,20 @@ def mask_account_card(number: str) -> str:
 
 def get_date(date: str) -> str:
     """Функция принимает на вход строку и отдает корректный результат в формате 11.07.2018."""
-    if len(date) > 26:
+
+    # Проверяем, есть ли точка после секунд
+    if '.' in date and date.endswith('.'):
         return "Error"
-    else:
-        correct_date = date[8:10] + "." + date[5:7] + "." + date[0:4]
+
+    # Далее продолжаем обработку, как раньше
+    if len(date) < 10 or len(date) > 26:
+        return "Error"
+
+    try:
+        day = date[8:10]
+        month = date[5:7]
+        year = date[0:4]
+        correct_date = f"{day}.{month}.{year}"
         return correct_date
+    except IndexError:
+        return "Error"
