@@ -32,3 +32,19 @@ def test_mask_account_card(numbers_info, expected):
 )
 def test_get_data(data_info, expected):
     assert get_date(data_info) == expected
+
+
+@pytest.mark.parametrize(
+    "data_info, expected",
+    [
+        ("2024-03-11T02:26:18.671407", "11.03.2024"),
+        ("2022-04-12T04:27:18.671407", "12.04.2022"),
+        ("2014-03-11T02:26:18.", "Error"),  # теперь вернет "Error"
+        ("2024-03-11T02:26:18.671407TR", "Error"),
+        ("", "Error"),
+        ("12345", "Error"),  # случай короткой строки
+        ("123456789012345678901234567890", "Error"),  # слишком длинная строка
+    ],
+)
+def test_get_data(data_info, expected):
+    assert get_date(data_info) == expected
